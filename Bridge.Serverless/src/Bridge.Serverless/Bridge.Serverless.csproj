@@ -13,5 +13,11 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Amazon.Lambda.AspNetCoreServer" Version="9.0.2"/>
+        <PackageReference Include="AWSSDK.S3" Version="3.7.416.5" />
+        <PackageReference Include="QRCoder" Version="1.6.0" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\Bridge.Core.DynamoDB\Bridge.Core.DynamoDB.csproj" />
+      <ProjectReference Include="..\..\..\Bridge.Domain\Bridge.Domain.csproj" />
     </ItemGroup>
 </Project>

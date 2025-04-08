@@ -1,3 +1,6 @@
+using Amazon.Lambda.APIGatewayEvents;
+using Amazon.Lambda.Core;
+
 namespace Bridge.Serverless;
 
 /// <summary>
