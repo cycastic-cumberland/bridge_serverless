@@ -17,19 +17,22 @@ namespace Bridge.Core.DynamoDB;
 public class PasteRepository : Repository<PasteConfigurations>, IPasteRepository
 {
     private readonly RoomRepository _roomRepository;
+    private readonly INotifier _notifier;
 
     public PasteRepository(RoomRepository roomRepository,
         IOptions<PasteConfigurations> configurations,
         IAmazonDynamoDB dynamoDb,
-        ILogger<PasteRepository> logger)
+        ILogger<PasteRepository> logger,
+        INotifier notifier)
         : base(configurations, dynamoDb, logger)
     {
         _roomRepository = roomRepository;
+        _notifier = notifier;
     }
 
     public async Task CreatePasteAsync(Guid roomId, string content, CancellationToken cancellationToken)
     {
-        if (content.Length > (Configurations.PasteExpirationMinutes ?? 8192))
+        if (content.Length > (Configurations.LengthLimit ?? 8192))
         {
             throw new BadRequestException("Content length is over the preset limit.");
         }
@@ -58,6 +61,11 @@ public class PasteRepository : Repository<PasteConfigurations>, IPasteRepository
             };
             await PutAsync(truePaste, cancellationToken);
         }
+
+        await _notifier.NotifyAsync(roomId.ToString(),
+            NotificationPayload.Pastes.UpdatedObjects,
+            NotificationPayload.Pastes,
+            cancellationToken);
     }
     
     private async Task<T> GetPasteAsync<T>(Guid roomId, long itemId, CancellationToken cancellationToken)

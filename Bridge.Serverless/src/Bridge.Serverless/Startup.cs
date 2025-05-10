@@ -1,5 +1,6 @@
 ﻿using Amazon.DynamoDBv2;
 using Bridge.Core.DynamoDB;
+using Bridge.Core.Pusher;
 using Bridge.Domain.Configurations;
 using Bridge.Infrastructure.Abstractions;
 using Bridge.Serverless.Dto;
@@ -41,6 +42,20 @@ public class Startup
         services.AddScoped<IRoomRepository>(sp => sp.GetRequiredService<RoomRepository>());
         services.AddScoped<IItemRepository>(sp => sp.GetRequiredService<ItemRepository>());
         services.AddScoped<IPasteRepository>(sp => sp.GetRequiredService<PasteRepository>());
+
+        if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("USE_DUMMY_NOTIFIER")))
+        {
+            services.AddSingleton<INotifier>(DumpNotifier.Default);
+        }
+        else
+        {
+            var pusherAppId = Environment.GetEnvironmentVariable(PusherNotifier.AppIdConstant);
+            if (string.IsNullOrEmpty(pusherAppId))
+            {
+                throw new InvalidOperationException("Pusher integration was not properly set up");
+            }
+            services.AddScoped<INotifier, PusherNotifier>();
+        }
         
         services.AddControllers(cfg =>
         {

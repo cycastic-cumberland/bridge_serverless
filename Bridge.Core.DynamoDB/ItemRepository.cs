@@ -18,16 +18,19 @@ public class ItemRepository : Repository<ItemConfigurations>, IItemRepository
 {
     private readonly RoomRepository _roomRepository;
     private readonly IStorageService _storageService;
+    private readonly INotifier _notifier;
     
     public ItemRepository(IOptions<ItemConfigurations> configurations,
         IAmazonDynamoDB dynamoDb,
         ILogger<ItemRepository> logger,
         RoomRepository roomRepository,
-        IStorageService storageService)
+        IStorageService storageService,
+        INotifier notifier)
         : base(configurations, dynamoDb, logger)
     {
         _roomRepository = roomRepository;
         _storageService = storageService;
+        _notifier = notifier;
     }
 
     public async Task<UploadPreSignedDto> GetPreSignedUploadUrlAsync(Guid roomId, string fileName, CancellationToken cancellationToken)
@@ -118,6 +121,10 @@ public class ItemRepository : Repository<ItemConfigurations>, IItemRepository
 
         item.IsReady = true;
         await PutAsync(item, cancellationToken);
+        await _notifier.NotifyAsync(roomId.ToString(),
+            NotificationPayload.Items.UpdatedObjects,
+            NotificationPayload.Items,
+            cancellationToken);
     }
 
     public async Task<string> GetPreSignedDownloadUrlAsync(Guid roomId, long itemId, CancellationToken cancellationToken)

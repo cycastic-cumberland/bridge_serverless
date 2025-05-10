@@ -1,16 +1,16 @@
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using Bridge.Domain;
 using Bridge.Infrastructure.Abstractions;
 
 namespace Bridge.Serverless.Services;
 
 public class S3StorageService : IStorageService, IDisposable
 {
-     private readonly AmazonS3Client _s3Client;
-     
-     protected static string BucketName => Environment.GetEnvironmentVariable("AWS_S3_BUCKET") ??
-                                           throw new InvalidOperationException("AWS_S3_BUCKET was not supplied");
+    private readonly AmazonS3Client _s3Client;
+
+    protected static string BucketName => ConfigurationHelpers.GetEnvironmentVariable("AWS_S3_BUCKET");
 
     public S3StorageService()
     {

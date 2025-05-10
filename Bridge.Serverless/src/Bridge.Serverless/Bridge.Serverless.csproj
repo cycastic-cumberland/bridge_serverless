@@ -18,6 +18,7 @@
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\..\..\Bridge.Core.DynamoDB\Bridge.Core.DynamoDB.csproj" />
+      <ProjectReference Include="..\..\..\Bridge.Core.Pusher\Bridge.Core.Pusher.csproj" />
       <ProjectReference Include="..\..\..\Bridge.Domain\Bridge.Domain.csproj" />
     </ItemGroup>
 </Project>
